@@ -27,7 +27,7 @@ function main
    echo "Starting Marachino"
    startMaraschino
 
-   restartVPN
+   #restartVPN
 }
 
 main >> ~/login.log 2>&1
