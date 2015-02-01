@@ -11,6 +11,8 @@ TRANSMISSION_REMOTE="/Users/admin/Transmission/bin/transmission-remote"
 UNRAR="/usr/local/bin/unrar"
 WGET="/usr/local/bin/wget"
 
+source ./seeding_complete_cleanup.sh
+
 # remove the torrent from transmission and delete the file
 function removeAndDeleteCompleteTorrent
 {
@@ -250,6 +252,10 @@ function main
    echo ""
    echo "=================== Started (`date`) =============================="
    echo "`date`: Running torrent post processing script"
+
+   write_transmission_info_file "$TR_TORRENT_ID"
+
+   cleanup_seeding_torrents >> $LOG_DIR/seeding_torrent_cleanup.log 2>&1
    
    local ratio="`torrentSeedRatio`"
 
