@@ -28,11 +28,13 @@ function process_seed_descriptors
 function process_seeding_descriptor_callback
 {
    local info_file="$1"
+   local info_file_contents="`cat \"$info_file\"`"
+
    if is_torrent_in_transmission "$info_file"
    then
-      echo "`cat $info_file` is still in transmission, nothing to do"
+      echo "$info_file_contents is still in transmission, nothing to do"
    else
-      echo "`cat $info_file` is no longer in transmission. Removing seed files..."
+      echo "$info_file_contents is no longer in transmission. Removing seed files..."
       remove_seeding_files "$info_file"
    fi
 }
@@ -50,17 +52,28 @@ function is_torrent_in_transmission
    local descriptorFile="$1"
    read -r id name tr_hash < "$descriptorFile" 
 
-   echo "is_torrent_in_transmission: id: $id, name: $name, hash: $tr_hash"
-   local transmission_hash="`torrent_hash $id`"
+   local info_line="`$TRANSMISSION_REMOTE --list | grep $name`"
+
+   echo "Info Line: $info_line"
+
+   if [ -z "$info_line" ]
+   then
+      return 1 # non-zero == false
+   else
+      return 0 # zero == true
+   fi
+
+   #local transmission_name="`torrent_name $id`"
+   #echo "   Transmission: $transmission_name , Descriptor: $name"
 
    # Check if the hash read from the descriptor file matches that in transmission
    # meaning that it is still in transmission and seeding
-   if [ "$transmission_hash" == "$tr_hash" ]
-   then
-      return 0 # 0 == true
-   else
-      return 1 # non-zero == false
-   fi
+   #if [ "$transmission_name" == "$name" ]
+   #then
+   #   return 0 # 0 == true
+   #else
+   #   return 1 # non-zero == false
+   #fi
 }
 
 # Get the hash for the torrent in transmission
@@ -92,7 +105,7 @@ function write_all_info_files
 {
    $TRANSMISSION_REMOTE --list | grep '100%' | tr -s ' ' | cut -d' ' -f2 | while read id
    do 
-      write_transmission_info_file "$id" "`torrent_location $id`"
+      write_transmission_info_file "$id"
    done
 }
 
@@ -102,7 +115,7 @@ function write_all_info_files
 function write_transmission_info_file
 {
    local id="$1"
-   local writeToDir="$2"
+   local writeToDir=""`torrent_location $id`""
 
    local tr_hash="`torrent_hash $id`"
    local tr_name="`torrent_name $id`"

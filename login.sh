@@ -8,26 +8,18 @@ source ~/scripts/functions.sh
 function main
 {
    nohup ~/scripts/run_remounter.sh &
-   
-   echo "Starting SAB"
+
    startSABnzbd
 
-   #echo "Starting SickBeard"
-   #startSickBeard
+   startTransmission
 
-   echo "Starting SickRage"
    startSickRage
 
-   echo "Starting CouchPotato"
    startCouchPotato
-   
-   echo "Starting XBMC"
+
    startXBMC
 
-   echo "Starting Marachino"
    startMaraschino
-
-   #restartVPN
 }
 
 main >> ~/login.log 2>&1

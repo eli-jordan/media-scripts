@@ -11,7 +11,7 @@ TRANSMISSION_REMOTE="/Users/admin/Transmission/bin/transmission-remote"
 UNRAR="/usr/local/bin/unrar"
 WGET="/usr/local/bin/wget"
 
-source ./seeding_complete_cleanup.sh
+source "/Users/admin/scripts/seeding_complete_cleanup.sh"
 
 # remove the torrent from transmission and delete the file
 function removeAndDeleteCompleteTorrent
@@ -114,7 +114,7 @@ function processCouchPotatoSeeded
    unpack "$torrentDir" "$TR_TORRENT_NAME"
 
    # run the renamer
-   runCouchPotatoRenamer "$torrentDir" "link"
+   runCouchPotatoRenamer "$torrentDir" "copy"
 }
 
 # Process a couch potato download that does not need to keep seeding
@@ -223,7 +223,7 @@ function processSickRageSeeded
    unpack "$torrentDir" "$TR_TORRENT_NAME"
 
    # run the renamer
-   runSickRageRenamer "$torrentDir" "symlink"
+   runSickRageRenamer "$torrentDir" "copy"
 }
 
 # Process a SickRage download that does not need to keep seeding
@@ -253,7 +253,8 @@ function main
    echo "=================== Started (`date`) =============================="
    echo "`date`: Running torrent post processing script"
 
-   write_transmission_info_file "$TR_TORRENT_ID"
+   # print info about the torrent
+   $TRANSMISSION_REMOTE -t$TR_TORRENT_ID  -i
 
    cleanup_seeding_torrents >> $LOG_DIR/seeding_torrent_cleanup.log 2>&1
    
@@ -262,7 +263,7 @@ function main
    # For 'zero' seed ratio, we don't need to worry about keeping the torrent file
    # around for seeding
    # Assume that the default is to not seed
-   if [ "$ratio" == "0.00" ] || [ "$ratio" == "Default" ]
+   if [ "$ratio" == "0.00" ] || [ "$ratio" == "Default" ] || [ -z "$ratio" ]
    then
       echo "SeedRatio $ratio is zero for $TR_TORRENT_NAME, no need to keep it around"
       echo "TR_TORRENT_DIR = $TR_TORRENT_DIR"
@@ -287,6 +288,8 @@ function main
          echo "Handling a CouchPotato download, where torrent needs to be retained"
          processCouchPotatoSeeded
       fi
+
+      write_transmission_info_file "$TR_TORRENT_ID"
    fi
 
    echo "=================== Finished (`date`) =============================="

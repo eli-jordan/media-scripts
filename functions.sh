@@ -48,6 +48,13 @@ function startMaraschino
    python ~/maraschino/Maraschino.py --port=7777 > /dev/null &
 }
 
+# start tyransmission
+function startTransmission
+{
+  echo "Starting Transmission..."
+  open -a Transmission
+}
+
 # how long to wait before attempting to mound the drive again
 SLEEP_TIME=600 # 600s = 10mins
 
