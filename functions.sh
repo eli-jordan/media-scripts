@@ -11,7 +11,7 @@ function startSABnzbd
 function startXBMC
 {
    echo "Starting XBMC..."
-   open -a XBMC
+   open -a Kodi
 }
 
 # start SickBeard TV show downloader
@@ -66,7 +66,7 @@ function startRemounter
     while true
     do
         echo "`date` attempting remount"
-        osascript -e 'tell application "Finder" to mount volume "smb://admin@10.0.1.9/Media"'
+        osascript -e 'tell application "Finder" to mount volume "afp://admin@10.0.1.9/Media"'
         sleep $SLEEP_TIME
     done      
 }

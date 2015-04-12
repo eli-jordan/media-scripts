@@ -52,7 +52,7 @@ function is_torrent_in_transmission
    local descriptorFile="$1"
    read -r id name tr_hash < "$descriptorFile" 
 
-   local info_line="`$TRANSMISSION_REMOTE --list | grep $name`"
+   local info_line="`$TRANSMISSION_REMOTE --list | grep '$name'`"
 
    echo "Info Line: $info_line"
 
