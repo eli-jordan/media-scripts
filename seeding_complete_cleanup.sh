@@ -8,6 +8,9 @@ SICKRAGE_SEEDED_HOLDING_DIR="/Users/admin/Downloads/TorrentDownloads/TV_SickRage
 # in case there is a bug in the script.
 SEEDING_COMPLETE_REMOVED="/Users/admin/Downloads/TorrentDownloads/SeedingComplete"
 
+# the separator used to separte the fields in the info file
+INFO_FILE_SEPARATOR='|'
+
 # Process the transmission seed descriptors, in a given root directory.
 # 
 # $1 the root directory to find transmission descriptors in
@@ -50,9 +53,15 @@ function remove_seeding_files
 function is_torrent_in_transmission 
 {
    local descriptorFile="$1"
-   read -r id name tr_hash < "$descriptorFile" 
 
-   local info_line="`$TRANSMISSION_REMOTE --list | grep '$name'`"
+   local old_ifs=$IFS
+   IFS=$INFO_FILE_SEPARATOR
+   read -r id name tr_hash < "$descriptorFile" 
+   IFS=$old_ifs
+
+   echo "Grepping for name \"$name\" in \"$descriptorFile\""
+
+   local info_line="`$TRANSMISSION_REMOTE --list | grep \"$name\"`"
 
    echo "Info Line: $info_line"
 
@@ -62,18 +71,13 @@ function is_torrent_in_transmission
    else
       return 0 # zero == true
    fi
+}
 
-   #local transmission_name="`torrent_name $id`"
-   #echo "   Transmission: $transmission_name , Descriptor: $name"
-
-   # Check if the hash read from the descriptor file matches that in transmission
-   # meaning that it is still in transmission and seeding
-   #if [ "$transmission_name" == "$name" ]
-   #then
-   #   return 0 # 0 == true
-   #else
-   #   return 1 # non-zero == false
-   #fi
+# Check if we can access transmission using transmission-remote
+function is_transmission_up
+{
+   $TRANSMISSION_REMOTE --list > /dev/null
+   return $?
 }
 
 # Get the hash for the torrent in transmission
@@ -123,12 +127,33 @@ function write_transmission_info_file
    local file_name="$writeToDir/$tr_name.transmission_info"
    echo "File Name: $file_name"
 
-   echo "$id $tr_name $tr_hash" > "$file_name"
+   echo "$id$INFO_FILE_SEPARATOR$tr_name$INFO_FILE_SEPARATOR$tr_hash" > "$file_name"
 }
 
 # The main entry point of this script
 function cleanup_seeding_torrents 
 {
+   # first check that we can contact transmission using transmission-remote
+   local sleep_time=10
+   for attempt in {1..5}
+   do
+      echo "Checking transmission attempt $attempt"
+      if is_transmission_up
+      then
+         echo "Transmission is up. Continuing."
+         break
+      else
+         echo "Unable to contact Transmission using transmission-remote, will retry in $sleep_time sec"
+         sleep $sleep_time
+      fi
+   done
+
+   if ! is_transmission_up
+   then
+      echo "Script was unable to contact transmission. Exiting..."
+      return -1
+   fi
+
    echo "`date`: ======================================= Start ==================================="
    echo "Seeding torrents cleanup: SickRage"
    process_seed_descriptors "$SICKRAGE_SEEDED_HOLDING_DIR" process_seeding_descriptor_callback
