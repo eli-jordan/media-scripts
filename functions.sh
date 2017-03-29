@@ -14,38 +14,33 @@ function startXBMC
    open -a Kodi
 }
 
-# start SickBeard TV show downloader
-function startSickBeard
-{
-   echo "Starting SickBeard..."
-   python ~/SickBeardThePirateBay/SickBeard.py > /dev/null &
-}
-
 function startSickRage
 {
   echo "Starting SickRage..."
-  python ~/SickRage/SickBeard.py > /dev/null &
+  print_ssl_debug_info
+  python2.7 ~/SickRage/SickBeard.py > /dev/null &
 }
 
 # start CouchPotato movie downloader
 function startCouchPotato
 {
    echo "Starting CouchPotato..."
-   python ~/CouchPotato/CouchPotato.py --daemon
+   print_ssl_debug_info
+   python2.7 ~/CouchPotato/CouchPotato.py --daemon
 }
 
 # start Headphones music downloader
 function startHeadphones
 {
    echo "Starting Headphones..."
-   python ~/headphones/Headphones.py > /dev/null &
+   python2.7 ~/headphones/Headphones.py > /dev/null &
 }
 
 # start the maraschino dashboard
 function startMaraschino
 {
    echo "Starting Maraschino..."
-   python ~/maraschino/Maraschino.py --port=7777 > /dev/null &
+   python2.7 ~/maraschino/Maraschino.py --port=7777 > /dev/null &
 }
 
 # start tyransmission
@@ -53,6 +48,21 @@ function startTransmission
 {
   echo "Starting Transmission..."
   open -a Transmission
+}
+
+function print_ssl_debug_info
+{
+  echo "Open SSL Version"
+  openssl version
+  echo ""
+
+  echo "Python Version"
+  python2.7 --version
+  echo ""
+  
+  echo "Python SSL Version"
+  python2.7 -c 'import ssl; print(ssl.OPENSSL_VERSION)'
+  echo ""
 }
 
 # how long to wait before attempting to mound the drive again

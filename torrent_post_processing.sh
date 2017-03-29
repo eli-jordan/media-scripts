@@ -93,7 +93,8 @@ function unpack
 
 CP_HOST="localhost"
 CP_PORT="5050"
-CP_API_KEY="5655d18f80c04c61ad88530e8cb23df5"
+CP_API_KEY="488686af46144736a7f32e5c84372be4"
+
 
 COUCHPOTATO_SEEDED_HOLDING_DIR="/Users/admin/Downloads/TorrentDownloads/Movies_CouchPotato_Seeding"
 COUCHPOTATO_DOWNLOAD_DIR="/Users/admin/Downloads/TorrentDownloads/Movies_CouchPotato"

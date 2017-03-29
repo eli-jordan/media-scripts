@@ -4,6 +4,7 @@
 # in an automator application that is added to login items.
 
 source ~/scripts/functions.sh
+export PATH="/usr/local/bin:$PATH"
 
 function main
 {
