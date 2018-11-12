@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# test
+
 # start SAB NZB downloader application
 function startSABnzbd
 {
